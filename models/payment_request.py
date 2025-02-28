@@ -10,6 +10,7 @@ class PaymentRequest(models.Model):
         for record in self:
             zeroes = "0"*(5 - len(str(record.id)))
             record.name = "PAY-RQ-"+str(record.create_date.year)+"/"+str(record.create_date.month)+"/"+zeroes+str(record.id)
+
     name=fields.Char(string="Number",compute="_compute_number")
     source_type = fields.Selection(selection=[('other','Other'),('advance','Advance'),('sfc','Student Faculty Club')],string="Source Type", required=True)
     sfc_source = fields.Char(string="SFC Source",readonly=True)

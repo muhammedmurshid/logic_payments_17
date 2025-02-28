@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+<!--        <record id="group_faculty_accountant" model="res.groups">-->
+<!--            <field name="name">Accountant</field>-->
+<!--            <field name="category_id" ref="openeducat_core.module_management"/>-->
+<!--        </record>-->
+    </data>
+</odoo>

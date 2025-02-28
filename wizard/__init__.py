@@ -1,0 +1,1 @@
+from . import register_pay_wizard

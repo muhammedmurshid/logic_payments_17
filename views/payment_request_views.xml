@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record model="ir.actions.act_window" id="details_payment_request_action">
+        <field name="name">Payment Requests</field>
+        <field name="res_model">payment.request</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="payments_pay_req_action" model="ir.actions.act_window">
+        <field name="name">Payments</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,form</field>
+        <!-- <field name="view_id" eval="False"/> -->
+        <!-- <field name="search_view_id" ref="account.outbound_filter"/> -->
+        <field name="context">{'create':0,'default_pay_req_id': active_id}</field>
+        <field name="domain">[('payment_request_id', '=', active_id)]</field>
+    </record>
+
+    <record id="action_account_payments_copy" model="ir.actions.act_window">
+        <field name="name">Payments</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,kanban,form,graph</field>
+        <field name="context">{
+            'default_payment_type': 'outbound',
+            'default_partner_type': 'vendor',
+            'search_default_outbound_filter': 1,
+            'default_move_journal_types': ('bank', 'cash'),
+            }
+        </field>
+        <field name="view_id" ref="account.view_account_payment_tree"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a payment
+            </p>
+            <p>
+                Payments are used to register liquidity movements. You can process those payments by your own means or
+                by using installed facilities.
+            </p>
+        </field>
+    </record>
+
+    <menuitem name="Payments" id="menu_payment_parent"
+              action="details_payment_request_action"
+              sequence="6"
+              groups="openeducat_core.group_op_accounts"/>
+    <menuitem name="Requests" id="menu_payment_request_1"
+              action="details_payment_request_action"
+              parent="menu_payment_parent"
+              sequence="1"
+              groups="openeducat_core.group_op_accounts"/>
+    <menuitem name="Payments" id="menu_payment_payments_1"
+              action="action_account_payments_copy"
+              parent="menu_payment_parent"
+              sequence="2"
+              groups="openeducat_core.group_op_accounts"/>
+
+
+    <record id="payment_request_tree_view" model="ir.ui.view">
+        <field name="name">Payment Requests</field>
+        <field name="model">payment.request</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="source_type"/>
+                <field name="source_user"/>
+                <field name="amount"/>
+                <field name="payment_expect_date"/>
+                <field name="payment_date"/>
+                <field name="state" string="Status" decoration-success="state == 'paid'"
+                       decoration-info="state == 'payment_draft'" decoration-warning="state == 'payment_request'"
+                       decoration-danger="state == 'reject'" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="payment_request_form_view" model="ir.ui.view">
+        <field name="name">Payment Request</field>
+        <field name="model">payment.request</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Payment Request">
+                <header>
+                    <button name="action_confirm" groups="openeducat_core.group_op_accounts" string="Confirm"
+                            help="Click here to confirm the payment request" type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="register_payment" groups="openeducat_core.group_op_accounts" string="Register Payment"
+                            help="Click here to register the payment record" type="object" class="oe_highlight"
+                            invisible="hide_register_pay_button == True"/>
+                    <button name="head_approve" groups="openeducat_core.group_op_accounts" string="Approve"
+                            help="Click here to approve the payment request " type="object" class="oe_highlight"
+                            invisible="state == 'payment_request'"/>
+                    <button name="reject_payment" groups="openeducat_core.group_op_accounts" string="Reject"
+                            help="Click here to reject the payment request" type="object" class="btn-danger"
+                            invisible="state in (False,'paid','reject')"/>
+
+                    <!-- <button name="reset_to_draft" string="Reset to Draft" help="Click here to reset the record to draft state" type="object" class="btn-warning" attrs="{'invisible':[('state','!=','submit_payment')]}"/> -->
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,payment_request,approved,payment_draft,paid,reject"/>
+
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box" groups="base.group_user"
+                         invisible="payment_count == 0">
+                        <button class="oe_stat_button" name="%(logic_payments_17.payments_pay_req_action)d"
+                                type="action" icon="fa-rupee">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="payment_count" nolabel="1"/>
+                                </span>
+                                <span class="o_stat_text">
+                                    Payments
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" text="PAID" bg_color="bg-success" invisible="state != 'paid'"/>
+                    <widget name="web_ribbon" text="REJECTED" bg_color="bg-danger" invisible="state != 'reject'"/>
+                    <widget name="web_ribbon" text="PAYMENT DRAFTED" bg_color="bg-info"
+                            invisible="state != 'payment_draft'"/>
+
+                    <group>
+                        <group>
+                            <field name="hide_register_pay_button" invisible="1"/>
+                            <field name="is_account_head" invisible="1"/>
+                            <field name="source_type" readonly="state not in (False,'draft')"/>
+                            <field name="accountant" invisible="accountant == False"
+                                   readonly="state not in (False,'draft')"/>
+                            <field name="accounting_head" readonly="state not in (False,'draft')"/>
+                            <field name="sfc_source" invisible="source_type != 'sfc'"
+                                   readonly="state not in (False,'draft')"/>
+                            <field name="source_user" readonly="state not in (False,'draft')"
+                                   invisible="source_type in (False,'other')"/>
+                            <field name="description" readonly="state not in (False,'draft')"/>
+                        </group>
+                        <group>
+                            <field name="payment_expect_date" readonly="state not in (False,'draft')"/>
+                            <field name="payment_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Banking Details">
+                            <group>
+                                <group>
+                                    <field name="account_name"
+                                           help="Enter the account holder's name here(as in Passbook)"/>
+                                    <field name="account_no"/>
+                                    <field name="bank_name"/>
+                                    <field name="ifsc_code"/>
+                                    <field name="bank_branch"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </group>
+                                <group name="note_group" col="6" class="mt-2 mt-md-0">
+                                    <group class="oe_subtotal_footer oe_right" colspan="2">
+                                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                            <label for="amount"/>
+                                        </div>
+                                        <field name="amount" nolabel="1" readonly="state not in (False,'draft')"
+                                               class="oe_subtotal_footer_separator" widget="monetary"/>
+                                    </group>
+                                    <div class="oe_clear"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}"/>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>

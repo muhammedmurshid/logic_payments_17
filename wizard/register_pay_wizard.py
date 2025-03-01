@@ -1,5 +1,6 @@
 from odoo import fields,models,api
 from datetime import datetime
+
 class  PayWizard(models.TransientModel):
     _name="payment.register.wizard"
     journal = fields.Many2one('account.journal',string="Journal",required=True)
@@ -37,7 +38,6 @@ class  PayWizard(models.TransientModel):
             'ref': self.ref,
             'date': self.date,
             'is_internal_transfer':False,
-
         })
         payment_obj.action_post()
         # set the last activity to registered

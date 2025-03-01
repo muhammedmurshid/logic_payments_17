@@ -6,7 +6,6 @@ class PaymentRequest(models.Model):
     _description = "Payment Request"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
-    
     # _rec_name="number"
     def _compute_number(self):
         for record in self:

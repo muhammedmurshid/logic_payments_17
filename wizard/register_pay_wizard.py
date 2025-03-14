@@ -31,7 +31,7 @@ class  PayWizard(models.TransientModel):
         # need to add methods to create payment record in db
         payment_obj = self.env['account.payment'].create({
             'payment_type': 'outbound',
-            'partner_type': self.partner_type,
+            'partner_type': 'supplier',
             'payment_request_id':self.payment_request_id.id,
             'destination_account_id': self.destination_account_id.id,
             'amount': self.amount,

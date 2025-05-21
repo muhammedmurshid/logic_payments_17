@@ -43,7 +43,8 @@
     <menuitem name="Payments" id="menu_payment_parent"
               action="details_payment_request_action"
               sequence="6"
-              groups="openeducat_core.group_op_accounts"/>
+              groups="openeducat_core.group_op_accounts"
+              web_icon="logic_payments_17,static/description/icon.png"/>
     <menuitem name="Requests" id="menu_payment_request_1"
               action="details_payment_request_action"
               parent="menu_payment_parent"

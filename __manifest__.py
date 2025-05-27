@@ -10,6 +10,7 @@
         'views/account_payment_views.xml',
         'wizard/register_pay_wizard_views.xml',
         'data/activity.xml',
+        'views/discount_requests.xml'
     ],
     'demo': [],
     'summary': "Payments",

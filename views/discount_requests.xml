@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem name="Discount Requests" id="menu_discount_requests_1"
+              action="openeducat_core.action_discount_requests"
+              parent="menu_payment_parent"
+              sequence="3"
+              />
+
+</odoo>

@@ -56,7 +56,6 @@
               sequence="2"
               groups="openeducat_core.group_op_accounts"/>
 
-
     <record id="payment_request_tree_view" model="ir.ui.view">
         <field name="name">Payment Requests</field>
         <field name="model">payment.request</field>

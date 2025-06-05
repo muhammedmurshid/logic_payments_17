@@ -13,7 +13,6 @@ class AccountPaymentInherit(models.Model):
     def _get_default_pay_req_id(self):
         return self.env.context.get('default_pay_req_id')
     payment_request_id = fields.Many2one('payment.request',string="Payment Request", default=_get_default_pay_req_id)
-
     # override the original functions in account module
     
     def _prepare_payment_display_name(self):
@@ -44,5 +43,3 @@ class AccountPaymentInherit(models.Model):
                 'state':'payment_request'
             })
         return result
-
-    

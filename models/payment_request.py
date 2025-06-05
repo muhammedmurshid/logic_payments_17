@@ -24,11 +24,11 @@ class PaymentRequest(models.Model):
             return self.env.user.id
         else:
             return False
-    def get_acc_head_domain(self):
-        return [('id', 'in', self.env.ref('openeducat_core.group_op_accounts').users.ids)]
+    # def get_acc_head_domain(self):
+    #     return [('id', 'in', self.env.ref('openeducat_core.group_op_accounts').users.ids)]
     def get_acc_domain(self):
         return [('id', 'in', self.env.ref('openeducat_core.group_op_accounts').users.ids)]
-    accounting_head = fields.Many2one('res.users',string="Accounting Manager",domain=get_acc_head_domain, default=get_default_acc_manager)
+    accounting_head = fields.Many2one('res.users',string="Accounting Manager", default=get_default_acc_manager)
     accountant = fields.Many2one('res.users', string="Accountant",readonly=True)
     # @api.multi
     # @api.onchange('source_type')

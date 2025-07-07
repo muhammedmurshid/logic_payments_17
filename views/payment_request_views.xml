@@ -64,12 +64,13 @@
             <tree>
                 <field name="name"/>
                 <field name="source_type"/>
-                <field name="source_user"/>
+                <field name="source_user" widget="many2one_avatar"/>
                 <field name="amount"/>
                 <field name="payment_expect_date"/>
                 <field name="payment_date"/>
+                <field name="create_uid" string="Created By" widget="many2one_avatar"/>
                 <field name="state" string="Status" decoration-success="state == 'paid'"
-                       decoration-info="state == 'payment_draft'" decoration-warning="state == 'payment_request'"
+                       decoration-info="state == 'payment_draft'"
                        decoration-danger="state == 'reject'" widget="badge"/>
             </tree>
         </field>
@@ -82,40 +83,50 @@
         <field name="arch" type="xml">
             <form string="Payment Request">
                 <header>
-                    <button name="action_confirm" groups="openeducat_core.group_op_accounts" string="Confirm"
-                            help="Click here to confirm the payment request" type="object" class="oe_highlight"
-                            invisible="state != 'draft'"/>
-                    <button name="register_payment" groups="openeducat_core.group_op_accounts" string="Register Payment"
-                            help="Click here to register the payment record" type="object" class="oe_highlight"
-                            invisible="hide_register_pay_button == True"/>
+<!--                    <button name="action_confirm" groups="openeducat_core.group_op_accounts" string="Confirm"-->
+<!--                            help="Click here to confirm the payment request" type="object" class="oe_highlight"-->
+<!--                            invisible="state != 'draft'"/>-->
+<!--                    <button name="register_payment" groups="openeducat_core.group_op_accounts" string="Register Payment"-->
+<!--                            help="Click here to register the payment record" type="object" class="oe_highlight"-->
+<!--                            invisible="hide_register_pay_button == True"/>-->
                     <button name="head_approve" groups="openeducat_core.group_op_accounts" string="Approve"
-                            help="Click here to approve the payment request " type="object" class="oe_highlight"
-                            invisible="state == 'payment_request'"/>
+                            help="Click here to approve the payment request " type="object" class="oe_highlight" invisible="state != 'draft'"
+                            />
+                    <button name="act_paid" groups="openeducat_core.group_op_accounts" string="Paid"
+                             type="object" class="oe_highlight" invisible="state != 'approved'"
+                            />
                     <button name="reject_payment" groups="openeducat_core.group_op_accounts" string="Reject"
                             help="Click here to reject the payment request" type="object" class="btn-danger"
-                            invisible="state in (False,'paid','reject')"/>
+                            invisible="state != 'draft'"/>
 
                     <!-- <button name="reset_to_draft" string="Reset to Draft" help="Click here to reset the record to draft state" type="object" class="btn-warning" attrs="{'invisible':[('state','!=','submit_payment')]}"/> -->
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,payment_request,approved,payment_draft,paid,reject"/>
+                           statusbar_visible="draft,approved,payment_draft,paid,reject"/>
 
                 </header>
 
                 <sheet>
-                    <div class="oe_button_box" name="button_box" groups="base.group_user"
-                         invisible="payment_count == 0">
-                        <button class="oe_stat_button" name="%(logic_payments_17.payments_pay_req_action)d"
-                                type="action" icon="fa-rupee">
-                            <div class="o_field_widget o_stat_info">
-                                <span class="o_stat_value">
-                                    <field name="payment_count" nolabel="1"/>
-                                </span>
-                                <span class="o_stat_text">
-                                    Payments
-                                </span>
-                            </div>
+                    <div name="button_box" position="inside">
+                        <button class="oe_stat_button" type="object" name="get_current_seminar_expense_profile"
+                                icon="fa-user" string="Seminar Expense Tracker">
+                            <field string="Seminar Expense Count" name="seminar_expense_count" widget="statinfo"/>
                         </button>
+
                     </div>
+<!--                    <div class="oe_button_box" name="button_box" groups="base.group_user"-->
+<!--                         invisible="payment_count == 0">-->
+<!--                        <button class="oe_stat_button" name="%(logic_payments_17.payments_pay_req_action)d"-->
+<!--                                type="action" icon="fa-rupee">-->
+<!--                            <div class="o_field_widget o_stat_info">-->
+<!--                                <span class="o_stat_value">-->
+<!--                                    <field name="payment_count" nolabel="1"/>-->
+<!--                                </span>-->
+<!--                                <span class="o_stat_text">-->
+<!--                                    Payments-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                        </button>-->
+<!--                    </div>-->
                     <widget name="web_ribbon" text="PAID" bg_color="bg-success" invisible="state != 'paid'"/>
                     <widget name="web_ribbon" text="REJECTED" bg_color="bg-danger" invisible="state != 'reject'"/>
                     <widget name="web_ribbon" text="PAYMENT DRAFTED" bg_color="bg-info"
@@ -141,31 +152,31 @@
                         </group>
                     </group>
 
-                    <notebook>
-                        <page string="Banking Details">
-                            <group>
-                                <group>
-                                    <field name="account_name"
-                                           help="Enter the account holder's name here(as in Passbook)"/>
-                                    <field name="account_no"/>
-                                    <field name="bank_name"/>
-                                    <field name="ifsc_code"/>
-                                    <field name="bank_branch"/>
-                                    <field name="currency_id" invisible="1"/>
-                                </group>
-                                <group name="note_group" col="6" class="mt-2 mt-md-0">
-                                    <group class="oe_subtotal_footer oe_right" colspan="2">
-                                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">
-                                            <label for="amount"/>
-                                        </div>
-                                        <field name="amount" nolabel="1" readonly="state not in (False,'draft')"
-                                               class="oe_subtotal_footer_separator" widget="monetary"/>
-                                    </group>
-                                    <div class="oe_clear"/>
-                                </group>
-                            </group>
-                        </page>
-                    </notebook>
+<!--                    <notebook>-->
+<!--                        <page string="Banking Details">-->
+<!--                            <group>-->
+<!--                                <group>-->
+<!--                                    <field name="account_name"-->
+<!--                                           help="Enter the account holder's name here(as in Passbook)"/>-->
+<!--                                    <field name="account_no"/>-->
+<!--                                    <field name="bank_name"/>-->
+<!--                                    <field name="ifsc_code"/>-->
+<!--                                    <field name="bank_branch"/>-->
+<!--                                    <field name="currency_id" invisible="1"/>-->
+<!--                                </group>-->
+<!--                                <group name="note_group" col="6" class="mt-2 mt-md-0">-->
+<!--                                    <group class="oe_subtotal_footer oe_right" colspan="2">-->
+<!--                                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">-->
+<!--                                            <label for="amount"/>-->
+<!--                                        </div>-->
+<!--                                        <field name="amount" nolabel="1" readonly="state not in (False,'draft')"-->
+<!--                                               class="oe_subtotal_footer_separator" widget="monetary"/>-->
+<!--                                    </group>-->
+<!--                                    <div class="oe_clear"/>-->
+<!--                                </group>-->
+<!--                            </group>-->
+<!--                        </page>-->
+<!--                    </notebook>-->
 
                 </sheet>
                 <div class="oe_chatter">

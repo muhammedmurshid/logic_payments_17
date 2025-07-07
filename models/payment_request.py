@@ -47,7 +47,7 @@ class PaymentRequest(models.Model):
             self: self.env.user.company_id.currency_id.id,
             readonly=True)
 
-    state = fields.Selection(string="State",selection=[('draft','Draft'),('payment_request','Payment Requested'),('approved','Head Approved'),('payment_draft','Payment Drafted'),('paid','Paid'),('reject','Rejected')])
+    state = fields.Selection(string="State",selection=[('draft','Draft'),('approved','Approved'),('payment_draft','Payment Drafted'),('paid','Paid'),('reject','Rejected')], tracking=True)
     description = fields.Text(string="Description")
     account_name = fields.Char(string="Account Name")
     account_no = fields.Char(string="Account No")
@@ -70,7 +70,25 @@ class PaymentRequest(models.Model):
         for record in self:
             record.payment_count = len(record.payments)
     payment_count = fields.Integer(string="Payments Count",compute="_compute_payment_count")
-    
+
+    def get_current_seminar_expense_profile(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Seminar Expense Tracking',
+            'view_mode': 'tree,form',
+            'res_model': 'seminar.expenses',
+            'domain': [('id', '=', self.seminar_source.id)],
+            'context': "{'create': False}"
+        }
+    seminar_expense_count = fields.Integer(compute='compute_count_seminar_expense_count')
+
+    def compute_count_seminar_expense_count(self):
+        for record in self:
+            record.seminar_expense_count = self.env['op.student'].sudo().search_count(
+                [('id', '=', self.seminar_source.id)])
+
+
     @api.model
     def create(self, vals):
         vals['state'] = 'draft'
@@ -93,27 +111,17 @@ class PaymentRequest(models.Model):
                 summary=f"Payment Request of {self.currency_id.symbol}{self.amount} from {self.env.user.name}"
             )
             self.accountant = self.env.user.id
-            self.state = 'payment_request'
+
 
     def head_approve(self):
-        # Retrieve the approval request activities
-        activity_ids = self.env['mail.activity'].search([('payment_request', '=', self.id)], order='create_date asc')
-
-        if activity_ids:
-            activity_id = activity_ids[-1]  # Get the last activity
-            activity_id.action_feedback(feedback='Approved')
 
         self.state = 'approved'
 
-        # Create new activity for the accountant to register the payment
-        # self.activity_schedule(
-        #     'logic_payments_17.mail_activity_type_pay_request',
-        #     user_id = self.accountant.id,
-        #     payment_request = self.id,
-        #     date_deadline=self.payment_expect_date,
-        #     is_pay_approve_request=False,
-        #     summary=f"Register Payment of {self.currency_id.symbol}{self.amount}"
-        # )
+    def act_paid(self):
+        self.state = 'paid'
+        self.payment_date = fields.Date.today()
+        self.seminar_source.state = 'paid'
+        self.seminar_source.payment_date = fields.Date.today()
 
     def register_payment(self):
         # Display a popup with the entered details

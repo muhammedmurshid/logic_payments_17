@@ -2,7 +2,7 @@
     'name': "Payments",
     'version': "1.0.0",
     'sequence': "0",
-    'depends': ['base','mail', 'account','logic_base_17','openeducat_core', 'hr'],
+    'depends': ['base','mail', 'account','logic_base_17','openeducat_core', 'hr',],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

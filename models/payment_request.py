@@ -47,7 +47,7 @@ class PaymentRequest(models.Model):
             self: self.env.user.company_id.currency_id.id,
             readonly=True)
 
-    state = fields.Selection(string="State",selection=[('draft','Draft'),('approved','Approved'),('payment_draft','Payment Drafted'),('paid','Paid'),('reject','Rejected')], tracking=True)
+    state = fields.Selection(string="State",selection=[('draft','Draft'),('approved','Approved'),('paid','Paid'),('reject','Rejected')], tracking=True)
     description = fields.Text(string="Description")
     account_name = fields.Char(string="Account Name")
     account_no = fields.Char(string="Account No")
@@ -57,7 +57,7 @@ class PaymentRequest(models.Model):
     payments = fields.One2many('account.payment','payment_request_id',string="Payments")
     def _compute_hide_register_pay_button(self):
         for record in self:
-            record.hide_register_pay_button = (record.state in ('draft','paid','reject') ) or ( not record.is_account_head and (record.state not in ('payment_draft','approved')) )
+            record.hide_register_pay_button = (record.state in ('draft','paid','reject') ) or ( not record.is_account_head and (record.state not in ('approved')) )
     hide_register_pay_button = fields.Boolean(compute="_compute_hide_register_pay_button",default=True)
 
     def _compute_is_account_head(self):

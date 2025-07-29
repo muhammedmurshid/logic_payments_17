@@ -122,6 +122,9 @@ class PaymentRequest(models.Model):
         self.payment_date = fields.Date.today()
         self.seminar_source.state = 'paid'
         self.seminar_source.payment_date = fields.Date.today()
+        if self.source_type == 'expenses':
+            if self.expense_rec_id:
+                self.expense_rec_id.state = 'paid'
 
     def register_payment(self):
         # Display a popup with the entered details
@@ -168,3 +171,7 @@ class PaymentRequest(models.Model):
             self.sfc_source.write({
                 'state':'reject'
             })
+        if self.source_type == 'expenses':
+            if self.expense_rec_id:
+                self.expense_rec_id.state = 'cancel'
+                
